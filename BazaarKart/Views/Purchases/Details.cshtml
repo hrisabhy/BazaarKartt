@@ -1,0 +1,42 @@
+﻿@model BazaarKart.Models.Purchase
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Purchase</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Purchase_prd)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Purchase_prd)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Purchase_qty)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Purchase_qty)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Purchase_date)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Purchase_date)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

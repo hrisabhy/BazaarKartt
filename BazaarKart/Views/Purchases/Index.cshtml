@@ -1,0 +1,56 @@
+﻿@model IEnumerable<BazaarKart.Models.Purchase>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<h2>Purchase Details</h2>
+
+<p>
+    @Html.ActionLink("Create New", "PurchaseProduct")
+</p>
+<p>
+    <a href="~/PurchaseReport.aspx">Purchase Report</a>
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.Label("Purchased Product")
+        </th>
+        <th>
+            @Html.Label("Purchased Quantity")
+        </th>
+        <th>
+            @Html.Label("Date of purchase")
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Purchase_prd)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Purchase_qty)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Purchase_date)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.id }, new { @class = "btn btn-primary" }) |
+                @Html.ActionLink("Details", "Details", new { id = item.id }, new { @class = "btn btn-info" }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.id }, new { @class = "btn btn-danger" })
+            </td>
+        </tr>
+    }
+
+</table>
