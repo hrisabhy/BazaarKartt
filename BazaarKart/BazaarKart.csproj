@@ -341,6 +341,7 @@
     <Content Include="DataSet1.xsc">
       <DependentUpon>DataSet1.xsd</DependentUpon>
     </Content>
+    <Content Include="ClassDiagram1.cd" />
     <None Include="DataSet1.xsd">
       <SubType>Designer</SubType>
       <Generator>MSDataSetGenerator</Generator>
@@ -360,6 +361,7 @@
     <Content Include="DataSet2.xss">
       <DependentUpon>DataSet2.xsd</DependentUpon>
     </Content>
+    <Content Include="Models\modelsDiagram.cd" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
     <Content Include="Scripts\jquery-3.4.1.min.js" />
