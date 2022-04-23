@@ -1,0 +1,915 @@
+**
+NOTE-
+<welcome-file-list> is used for determining the "leading" page of your site; add it to web.xml in every project
+
+web.xml of servlet
+<welcome-file-list>
+        <welcome-file>insertEmployee.html</welcome-file>
+    </welcome-file-list>
+**
+
+PRAC 2 - SERVLET
+
+insertEmployee.html
+<html>
+    <head>
+        <title>EMPLOYEE REGISTRATION</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <form method="post" action="EmployeeServlet">
+            Id: <input type="text" name="txtid"/><br><br>
+            Name:<input type="text" name="txtname"/><br><br>
+            Address:<textarea name="txtaddress" rows="5" cols="10"></textarea>><br><br>
+            Contact:<input type="text" name="txtno"/><br><br>
+            Age:<input type="text" name="txtage"/><br><br>
+            <input type="submit" value="Add Data"/>
+            <input type="reset" value="Clear"/>
+        </form>
+    </body>
+</html>
+
+EmployeeServlet.java
+package Employee_package;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.sql.*;
+
+
+public class EmployeeServlet extends HttpServlet {
+    int age, contact,id;
+    String name, address;
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out= response.getWriter();
+        out.println("<!DOCTYPE html>"); //for retriving code
+        out.println("<html>");
+        out.println("<head>");
+        out.println("<title>Employee Servlet</title>");
+        out.println("</head>");
+        out.println("<body>");
+        out.println("<h1 align='center'><a href='insertEmployee.html'>Click here to go back to insert employee data</a></h1><br><br>");
+        out.println("<h1 align='center'><a href='employee.html'>Click here to fetch employee details using employee id</a></h1>");
+        out.println("</body>");
+        out.println("</html>");
+        id = Integer.parseInt(request.getParameter("txtid"));
+        name = request.getParameter("txtname");
+        address = request.getParameter("txtaddress");
+        age = Integer.parseInt(request.getParameter("txtage"));
+        contact = Integer.parseInt(request.getParameter("txtno"));
+        try{
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Connection con = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=users","root","root");
+            System.out.println("Connection is created");
+            Statement stmt = con.createStatement();
+            System.out.println("Inserting records into database");
+            String query = "insert into employees values('"+id+"','"+name+"','"+address+"','"+contact+"','"+age+"')";
+            stmt.executeQuery(query);
+            System.out.println("Records inserted");
+        
+        
+    }   catch (ClassNotFoundException |SQLException e) {
+           System.out.println(e);
+        }
+    }
+}
+
+PRAC 3 - COOKIES
+index.html
+<html>
+    <head>
+        <title>Cookies</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <form method="post" action="AddCookie">
+            First Name:<input type="text" name="txtfname"/><br><br>
+            Last Name:<input type="text" name="txtlname"/><br><br>
+            Contact:<input type="text" name="txtno"/><br><br>
+            Age:<input type="text" name="txtage"/><br><br>
+
+            <input type="submit" value="Submit">
+        </form>
+    </body>
+</html>
+
+addcookie.java
+package cookie;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ *
+ * @author Ameya Pitkar
+ */
+@WebServlet(name = "AddCookie", urlPatterns = {"/AddCookie"})
+public class AddCookie extends HttpServlet {
+
+    /**
+     * Handles the HTTP <code>POST</code> method.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");//use this and printwriter object only when you want to retrieve cookies
+        PrintWriter out = response.getWriter();
+        out.println("<!DOCTYPE html>");
+        out.println("<html>");
+        out.println("<head>");
+        out.println("<title>Servlet AddCookies </title>");
+        out.println("</head>");
+        out.println("<body>");
+        try{
+            String fName = request.getParameter("txtfname");
+            out.println("<h1>Hello "+ fName +"!!!"+"<br>"+"Welcome to my website</h1>"+"<br>");
+            out.println("<h1><a href = 'RetCookie'>Go to Servlet 2</a></h1>"+"<br>");
+            String lName = request.getParameter("txtlname");
+            String contact = request.getParameter("txtno");
+            String age = request.getParameter("txtage");
+            
+            Cookie c1 = new Cookie("username", fName);
+            Cookie c2 = new Cookie("lastname", lName);
+            Cookie c3 = new Cookie("contact", contact);
+            Cookie c4 = new Cookie("age", age);
+            
+            response.addCookie(c1);
+            response.addCookie(c2);
+            response.addCookie(c3);
+            response.addCookie(c4);
+            
+            System.out.println("Cookies saved");
+            out.println("</body>");
+            out.println("</html>");
+        }
+        catch(Exception e){
+            
+        }
+    }
+   
+}
+
+retrievecookie.java
+package cookie;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ *
+ * @author Ameya Pitkar
+ */
+@WebServlet(name = "RetCookie", urlPatterns = {"/RetCookie"})
+public class RetCookie extends HttpServlet {
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    /**
+     * Handles the HTTP <code>GET</code> method.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try(PrintWriter out = response.getWriter()){
+            out.println("<!DOCTYPE html>");
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<title>Servlet RetCookies</title>");
+            out.println("</head>");
+            out.println("<body>");
+            Cookie[] cookies = request.getCookies();
+            System.out.println("Cookies Retrieved");
+            boolean f = false;
+            String fName = " ";
+            String lName = " ";
+            String contact = " ";
+            String age = " ";
+            
+            if(cookies == null){
+                out.println("<h1>You are a new user.... Go to Home Page and submit your details</h1>");
+            }
+            else{
+                for(Cookie c:cookies){
+                    String Fname = c.getName();
+                    String Lname = c.getName();
+                    String Contact = c.getName();
+                    String Age = c.getName();
+                    
+                    if(Fname.equals("username")){
+                        f = true;
+                        fName = c.getValue();
+                    }
+                    
+                    if(Lname.equals("lastname")){
+                        f = true;
+                        lName = c.getValue();
+                    }
+                    
+                    if(Contact.equals("contact")){
+                        f = true;
+                        contact = c.getValue();
+                    }
+                    
+                    if(Age.equals("age")){
+                        f = true;
+                        age = c.getValue();
+                    }
+                }
+                if(f){
+                        out.println("<h1>Hello "+ fName + "!!!" + "<br>" + "Welcome back to my website</h1>"+"<br>"+"<br>");
+                        out.println("<h2>Your last name is "+ lName +"</h2>"+"<br>");
+                        out.println("<h2>Your Contact no. is "+ contact +"</h2>"+"<br>");
+                        out.println("<h2>Your Age is "+ age +"</h2>"+"<br>"+"<br>");
+                        out.println("<h2>Thank You!!!</h2>");
+                    }
+                    else{
+                        out.println("<h1>You are a new user.... Go to Home Page and submit your details</h1>");
+                    }
+                    out.println("</body>");
+                    out.println("</html>");
+            }
+        }
+    }
+
+}
+
+PRAC 4 - SERVLET
+employee.html
+<html>
+    <head>
+        <title>Fetch Employees</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <form method="post" action="getServlet">
+            Enter Employee ID = <input type="text" name="empID">
+            <input type="submit" value="Submit">
+        </form>
+    </body>
+</html>
+
+getServlet.java
+package Employee_package;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+
+public class getServlet extends HttpServlet {
+    String emp_name,emp_addr;
+    int emp_no, emp_age;
+    
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException{
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        try{
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Connection conn = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=users","root","root");
+            int empid = Integer.parseInt(request.getParameter("empID"));
+            String query="select * from employees where id='"+empid+"'";
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while(rs.next()){
+                emp_name = rs.getString("name");
+                emp_addr = rs.getString("address");
+                emp_no = rs.getInt("contact");
+                emp_age = rs.getInt("age");
+            }
+            out.println("<!DOCTYPE html>");
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<title>Get Servlet</title>");
+            out.println("</head>");
+            out.println("<body>");
+                    
+            out.println("<h2>Name of the employee: '"+emp_name+"'</h2><br><br>");
+            out.println("<h2>Address of the employee: '"+emp_addr+"'</h2><br><br>");
+            out.println("<h2>Contact of the employee: '"+emp_no+"'</h2><br><br>");
+            out.println("<h2>Age of the employee: '"+emp_age+"'</h2><br><br>");
+            
+            out.println("</body>");
+            out.println("</html>");
+        }
+        catch(ClassNotFoundException | SQLException e){
+            System.out.println(e);
+        }
+    }
+
+
+PRAC 5 - JSP
+index.html
+<html>
+    <head>
+        <title>JSP and useBean</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <form action="welcome.jsp" method="get">
+            Employee ID: <input type="text" name="id"/><br><br>
+            Employee Name: <input type="text" name="name"/><br><br>
+            <input type="submit" value="Submit"/>
+        </form>
+    </body>
+</html>
+
+welcome.jsp
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
+    </head>
+    <body>
+        <jsp:useBean id="e" class="JSPApp.empInfo"></jsp:useBean>
+        <jsp:setProperty name="e" property="*"/>
+        Records are:
+        <jsp:getProperty name="e" property="id"/>
+        <jsp:getProperty name="e" property="name"/>
+    </body>
+</html>
+
+empInfo.java
+package JSPApp;
+
+/**
+ *
+ * @author Ameya Pitkar
+ */
+public class empInfo {
+    private int id;
+    private String name;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+}
+
+PRAC 6 - JSP MVC (FOODCART)
+index.html
+
+<html>
+    <head>
+        <title>Food Cart</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <h1>Welcome to food cart!!!</h1>
+        <a href="./foodcart_servlet"><p align="center">Go to Menu</p></a>
+    </body>
+</html>
+
+show_food.jsp
+
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>View Food Menu</title>
+    </head>
+    <body>
+        <h1 align="center">Menu</h1>
+        <table border="2" cellpadding="30x" align="center" bgcolor="yellow">
+            <tr>
+                <th>Code</th>
+                <th>Item</th>
+                <th>Price</th>
+            </tr>
+            <c:forEach var="food_items" items="${foodItems}">
+                <tr>
+                    <td>${food_items.id}</td>
+                    <td>${food_items.item}</td>
+                    <td> Rs ${food_items.price}/Kg</td>
+                </tr>
+            </c:forEach>
+        </table>
+    </body>
+</html>
+
+Food.java
+
+package foodcart;
+
+/**
+ *
+ * @author Ameya Pitkar
+ */
+public class Food {
+    private int id;
+    private String item;
+    private Float price;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getItem() {
+        return item;
+    }
+
+    public void setItem(String item) {
+        this.item = item;
+    }
+
+    public float getPrice() {
+        return price;
+    }
+
+    public void setPrice(Float price) {
+        this.price = price;
+    }
+
+    public Food(int id, String item, Float price){
+        this.id = id;
+        this.item = item;
+        this.price = price;
+    }
+}
+
+FoodCartDB.java
+
+package foodcart;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ *
+ * @author Ameya Pitkar
+ /
+public class FoodcartDB {
+    public static List<Food> getFoodList(){
+        ArrayList<Food> food = new ArrayList<>();
+        try{
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Connection con = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=foodcartdb","root","root");
+            Statement stmt = con.createStatement();
+            System.out.println("Connection created!!");
+            ResultSet rs = stmt.executeQuery("select from foodcart");
+            while(rs.next()){
+                int id = rs.getInt(1);
+                String item = rs.getString(2);
+                Float price = rs.getFloat(3);
+                Food f = new Food(id,item,price);
+                food.add(f);
+            }
+        }
+        catch(ClassNotFoundException | SQLException e){
+            System.out.println(e);
+        }
+        return food;
+    }
+}
+
+foodcart_servlet.java
+
+package foodcart;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ *
+ * @author Ameya Pitkar
+ */
+public class foodcart_servlet extends HttpServlet {
+
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try{
+            List<Food> foodItems = FoodcartDB.getFoodList();
+            request.setAttribute("foodItems", foodItems);
+        }
+        catch(Exception e){
+            System.out.println(e);
+        }
+        RequestDispatcher dispatcher = request.getRequestDispatcher("show_food.jsp");
+        dispatcher.forward(request, response);
+    }
+}
+
+PRAC 7 - STRUTS
+
+index.html
+
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Struts Demo</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <form action="myaction">
+            Enter Name:<input type="text" name="name">
+            Enter Password:<input type="text" name="password">
+            <input type="submit" value="Say Hello">
+        </form>
+    </body>
+</html>
+
+MyAction.java
+
+package my_struts_package;
+
+import com.opensymphony.xwork2.ActionSupport;
+
+/**
+ *
+ * @author Ameya Pitkar
+ */
+public class MyAction extends ActionSupport {
+    String name, password;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+
+    public MyAction() {
+    }
+
+    @Override
+    public String execute() throws Exception {
+        if("abc".equals(name)&"admin".equals(password)){
+            return "SUCCESS";
+        }
+        else{
+            return "ERROR";
+        }
+
+    }
+
+}
+
+struts.xml
+
+<struts>
+    <!-- Configuration for the default package. -->
+    <package name="default" extends="struts-default">
+        <action name="myaction" class="my_struts_package.MyAction" method="execute">
+            <result name="SUCCESS">success.jsp</result>
+            <result name="ERROR">error.jsp</result>
+        </action>
+    </package>
+</struts>
+
+success.jsp
+
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib uri="/struts-tags" prefix="s"%>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>SUCCESS PAGE</title>
+    </head>
+    <body>
+        <h1>SUCCESS!!!</h1>
+        <h2>Welcome, <s:property value="name"></s:property></h2>
+    </body>
+</html>
+
+error.jsp
+
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>ERROR Page</title>
+    </head>
+    <body>
+        <h1>ERROR!!!!</h1>
+        <h2>CHECK USERNAME OR PASSWORD</h2>
+    </body>
+</html>
+
+PRAC 8 - STRUTS
+index.html
+
+<html>
+    <head>
+        <title>STRUTS_DEMO_2</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <form action="greet_action">
+            Record name in database:<input type="text" name="name">
+            Record password in database:<input type="text" name="password">
+            <input type="submit" name="Enter">
+        </form>
+    </body>
+</html>
+
+GreetAll.java
+package GreetFromStruts;
+
+import com.opensymphony.xwork2.ActionSupport;
+
+/**
+ *
+ * @author Ameya Pitkar
+ */
+public class GreetAll extends ActionSupport {
+    String name,password;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+
+    public GreetAll() {
+    }
+
+    @Override
+    public String execute() throws Exception {
+        int i=GreetAlldb.save(this);
+        if(i>0)
+            return "success";
+        else
+            return "error";
+    }
+
+}
+
+GreetAlldb.java
+package GreetFromStruts;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+/**
+ *
+ * @author Ameya Pitkar
+ */
+public class GreetAlldb {
+    public static int save(GreetAll r){
+        int status=0;
+        try{
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        Connection con = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=greetdb","root","root");
+        PreparedStatement ps = con.prepareStatement("insert into struts_table values(?,?)");
+        ps.setString(1, r.getName());
+        ps.setString(2, r.getPassword());
+
+        status = ps.executeUpdate();
+    }
+    catch(ClassNotFoundException | SQLException e){
+        e.printStackTrace();
+    }
+        return status;
+    }
+
+}
+
+struts.xml
+<struts>
+    <!-- Configuration for the default package. -->
+    <package name="default" extends="struts-default">
+        <action name="greet_action" class="GreetFromStruts.GreetAll" method="execute">
+            <result name="success">success.jsp</result>
+            <result name="error">error.jsp</result>
+        </action>
+    </package> 
+</struts>
+
+success.jsp
+
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib uri="/struts-tags" prefix="s"%>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>SUCCESS PAGE</title>
+    </head>
+    <body>
+        <h1>SUCCESS!!!</h1>
+        <h2>Welcome, <s:property value="name"></s:property></h2>
+    </body>
+</html>
+
+error.jsp
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib uri="/struts-tags" prefix="s" %>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>ERROR Page</title>
+    </head>
+    <body>
+        <h1>Sorry, some error occurred!</h1>
+        <s:include value="index.html"></s:include>
+    </body>
+</html>
+
+Practical 9:
+Program in struts to insert a record in the database.
+a)index.html
+CODE:
+<html>
+<head>
+<title> CHALO AAGE BADHO </title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<a href="greet"> View all records </a>
+</body>
+</html>
+b)GreetAll.java
+CODE:
+package GreetFromStruts;
+import com.opensymphony.xwork2.ActionSupport;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+/**
+*
+* @author Shruti
+*/
+public class GreetAll extends ActionSupport {
+ArrayList<User> list= new ArrayList<User>();
+public ArrayList<User> getList() {
+return list;
+}
+public void setList(ArrayList<User> list) {
+this.list = list;
+}
+public GreetAll() {
+}
+public String execute() throws Exception {
+try{
+Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+Connection con = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=database_db1","root1","root");
+PreparedStatement ps=con.prepareStatement("select * from login");
+ResultSet rs=ps.executeQuery();
+while(rs.next()){
+User user = new User();
+user.setName(rs.getString(1));
+user.setPassword(rs.getString(2));
+list.add(user);
+}
+}
+catch(ClassNotFoundException | SQLException e){
+e.printStackTrace();
+}
+return "Success";
+}
+}
+c) User.java
+CODE:
+package GreetFromStruts;
+/**
+*
+* @author Shruti
+*/
+public class User {
+private String name,password;
+public String getName() {
+return name;
+}
+public void setName(String name) {
+this.name = name;
+}
+public String getPassword() {
+return password;
+}
+public void setPassword(String password) {
+this.password = password;
+}
+}
+d) displayrecords.jsp
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="s" uri="/struts-tags"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title> HELLOOOOO!!!!!!! </title>
+</head>
+<body>
+<h1>All records</h1>
+<s:iterator value="list">
+<fieldset>
+<s:property value="name"/><br>
+<s:property value="password"/><br>
+</fieldset>
+</s:iterator>
+</body>
+</html>
